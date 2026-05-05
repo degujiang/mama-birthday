@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>妈妈，生日快乐</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --cream: #fff8ee;
+      --peach: #ffe3d5;
+      --pink: #ff8fb1;
+      --pink-deep: #ec5f8e;
+      --rose: #ff6f91;
+      --gold: #ffc766;
+      --mint: #95e1d3;
+      --text: #5a3438;
+      --muted: #966d70;
+      --card: rgba(255, 255, 255, .76);
+      --shadow: 0 26px 70px rgba(201, 98, 117, .22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI Rounded", "Comic Sans MS", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 14% 10%, rgba(255, 205, 211, .78), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(255, 232, 166, .68), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(255, 153, 180, .20), transparent 35%),
+        linear-gradient(160deg, #fff7ef 0%, #ffe4da 52%, #fff1f6 100%);
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(26px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+      position: relative;
+      isolation: isolate;
+    }
+
+    .sky,
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.48);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.72);
+      animation: bubbleFloat 10s ease-in-out infinite;
+    }
+    .bubble:nth-child(1) { width: 56px; height: 56px; left: 8%; top: 14%; animation-delay: 0s; }
+    .bubble:nth-child(2) { width: 34px; height: 34px; left: 82%; top: 12%; animation-delay: 1.2s; }
+    .bubble:nth-child(3) { width: 46px; height: 46px; left: 78%; top: 72%; animation-delay: 2.4s; }
+    .bubble:nth-child(4) { width: 28px; height: 28px; left: 16%; top: 78%; animation-delay: 3.2s; }
+
+    .heart-float {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      transform: rotate(45deg);
+      background: rgba(255, 143, 177, .28);
+      border-radius: 4px;
+      animation: heartDrift 8s ease-in-out infinite;
+    }
+    .heart-float::before,
+    .heart-float::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: inherit;
+    }
+    .heart-float::before { left: -9px; top: 0; }
+    .heart-float::after { left: 0; top: -9px; }
+    .heart-float:nth-child(5) { left: 11%; top: 38%; animation-delay: .3s; }
+    .heart-float:nth-child(6) { left: 88%; top: 42%; animation-delay: 1.8s; }
+    .heart-float:nth-child(7) { left: 48%; top: 8%; animation-delay: 2.7s; }
+
+    .card {
+      width: min(100%, 440px);
+      border-radius: 32px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.88);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,255,255,.8), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .top {
+      position: relative;
+      padding: 28px 22px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      color: #b25869;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: inset 0 0 0 1px rgba(255, 143, 177, .16);
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .badge::before {
+      content: "✦";
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(255, 199, 102, .72);
+    }
+
+    .bear-wrap {
+      width: 118px;
+      height: 112px;
+      margin: 20px auto 14px;
+      position: relative;
+      filter: drop-shadow(0 16px 22px rgba(236, 95, 142, .18));
+      animation: softBounce 3s ease-in-out infinite;
+    }
+    .bear-head {
+      position: absolute;
+      left: 18px;
+      top: 22px;
+      width: 82px;
+      height: 72px;
+      border-radius: 45% 45% 42% 42%;
+      background: linear-gradient(180deg, #ffd5c2, #ffb8b9);
+      box-shadow: inset 0 -8px 0 rgba(236, 95, 142, .08);
+    }
+    .bear-ear {
+      position: absolute;
+      top: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ffb8b9;
+    }
+    .bear-ear.left { left: 12px; }
+    .bear-ear.right { right: 12px; }
+    .bear-ear::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.45);
+    }
+    .bear-eye {
+      position: absolute;
+      top: 48px;
+      width: 8px;
+      height: 12px;
+      border-radius: 50%;
+      background: #6b3d41;
+      animation: blink 4s ease-in-out infinite;
+    }
+    .bear-eye.left { left: 42px; }
+    .bear-eye.right { right: 42px; }
+    .bear-nose {
+      position: absolute;
+      left: 50%;
+      top: 61px;
+      width: 12px;
+      height: 9px;
+      border-radius: 50%;
+      background: #7b4549;
+      transform: translateX(-50%);
+    }
+    .bear-mouth {
+      position: absolute;
+      left: 50%;
+      top: 71px;
+      width: 22px;
+      height: 12px;
+      border-bottom: 3px solid rgba(123,69,73,.8);
+      border-radius: 0 0 18px 18px;
+      transform: translateX(-50%);
+    }
+    .bear-heart {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 24px;
+      height: 24px;
+      transform: rotate(45deg);
+      border-radius: 6px;
+      background: #ff6f91;
+      animation: miniHeart 1.6s ease-in-out infinite;
+    }
+    .bear-heart::before,
+    .bear-heart::after {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: inherit;
+    }
+    .bear-heart::before { left: -12px; top: 0; }
+    .bear-heart::after { left: 0; top: -12px; }
+
+    h1 {
+      margin: 0;
+      color: #66373d;
+      font-size: clamp(34px, 9vw, 46px);
+      line-height: 1.12;
+      letter-spacing: .5px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(255,255,255,.76);
+    }
+
+    .sub {
+      margin: 14px auto 0;
+      max-width: 17em;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .stage {
+      position: relative;
+      height: 210px;
+      margin: 18px 0 0;
+      overflow: hidden;
+    }
+
+    .gift {
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      width: 138px;
+      height: 110px;
+      transform: translateX(-50%);
+      transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+      filter: drop-shadow(0 16px 18px rgba(236, 95, 142, .16));
+      cursor: pointer;
+    }
+    .gift-box {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 76px;
+      border-radius: 18px 18px 22px 22px;
+      background: linear-gradient(180deg, #ff9ab8, #ff6f9b);
+      box-shadow: inset 0 -10px 0 rgba(179, 52, 88, .1);
+    }
+    .gift-box::before {
+      content: "";
+      position: absolute;
+      left: 45%;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffe9a6, #ffc766);
+      border-radius: 8px;
+    }
+    .gift-lid {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 70px;
+      height: 26px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffb2c8, #ff7aa2);
+      transform-origin: center bottom;
+      transition: transform .72s cubic-bezier(.2,.8,.2,1);
+      z-index: 2;
+    }
+    .gift-lid::before {
+      content: "";
+      position: absolute;
+      left: 46%;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #fff0b6, #ffc766);
+      border-radius: 8px;
+    }
+    .bow {
+      position: absolute;
+      left: 50%;
+      bottom: 92px;
+      width: 72px;
+      height: 34px;
+      transform: translateX(-50%);
+      z-index: 3;
+      transition: transform .72s cubic-bezier(.2,.8,.2,1);
+    }
+    .bow::before,
+    .bow::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      width: 34px;
+      height: 28px;
+      border-radius: 18px 18px 5px 18px;
+      background: #ff5f8f;
+      transform-origin: right bottom;
+    }
+    .bow::before { left: 0; transform: rotate(18deg); }
+    .bow::after {
+      right: 0;
+      border-radius: 18px 18px 18px 5px;
+      transform: scaleX(-1) rotate(18deg);
+    }
+    .bow-knot {
+      position: absolute;
+      left: 50%;
+      top: 9px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f24f83;
+      transform: translateX(-50%);
+    }
+
+    .cake-scene {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      width: 170px;
+      height: 150px;
+      transform: translateX(-50%) translateY(20px) scale(.72);
+      opacity: 0;
+      transition: opacity .55s ease .35s, transform .7s cubic-bezier(.2,.9,.2,1) .35s;
+      cursor: pointer;
+      filter: drop-shadow(0 18px 22px rgba(204, 93, 111, .16));
+    }
+    .cake-plate {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.86);
+      box-shadow: inset 0 -3px 0 rgba(229, 168, 164, .2);
+    }
+    .cake-base {
+      position: absolute;
+      left: 34px;
+      right: 34px;
+      bottom: 10px;
+      height: 56px;
+      border-radius: 18px 18px 16px 16px;
+      background: linear-gradient(180deg, #ffd2c7, #ff9fac);
+      box-shadow: inset 0 -9px 0 rgba(224, 82, 114, .1);
+    }
+    .cake-base::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 20px;
+      border-radius: 18px 18px 12px 12px;
+      background:
+        radial-gradient(circle at 18px 15px, #fff9ee 0 8px, transparent 9px),
+        radial-gradient(circle at 42px 15px, #fff9ee 0 8px, transparent 9px),
+        radial-gradient(circle at 66px 15px, #fff9ee 0 8px, transparent 9px),
+        radial-gradient(circle at 90px 15px, #fff9ee 0 8px, transparent 9px),
+        #fff9ee;
+    }
+    .sprinkle {
+      position: absolute;
+      width: 10px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--mint);
+      transform: rotate(-18deg);
+    }
+    .sprinkle.s1 { left: 54px; bottom: 42px; }
+    .sprinkle.s2 { left: 86px; bottom: 34px; background: var(--gold); transform: rotate(22deg); }
+    .sprinkle.s3 { left: 108px; bottom: 48px; background: #fff; transform: rotate(12deg); }
+
+    .candle {
+      position: absolute;
+      bottom: 68px;
+      width: 10px;
+      height: 30px;
+      border-radius: 6px;
+      background: repeating-linear-gradient(135deg, #fff4c9 0 7px, #ff8fb1 7px 13px);
+    }
+    .candle.c1 { left: 66px; }
+    .candle.c2 { left: 82px; height: 36px; }
+    .candle.c3 { left: 100px; }
+    .flame {
+      position: absolute;
+      left: 50%;
+      top: -22px;
+      width: 16px;
+      height: 22px;
+      border-radius: 50% 50% 50% 8px;
+      background: linear-gradient(180deg, #fff5a8, #ffb044);
+      box-shadow: 0 0 20px rgba(255, 176, 68, .72);
+      transform: translateX(-50%) rotate(45deg);
+      animation: flame 1.1s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+
+    .wish-card {
+      position: relative;
+      margin: 0 22px;
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows .7s cubic-bezier(.2,.8,.2,1), opacity .45s ease, margin-top .45s ease;
+    }
+    .wish-inner {
+      overflow: hidden;
+    }
+    .wish-paper {
+      position: relative;
+      padding: 20px 18px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,247,243,.84));
+      box-shadow: inset 0 0 0 1px rgba(255, 143, 177, .16);
+      text-align: left;
+    }
+    .wish-paper::before {
+      content: "♡";
+      position: absolute;
+      right: 18px;
+      top: 8px;
+      color: rgba(255, 111, 145, .26);
+      font-size: 42px;
+      font-weight: 900;
+    }
+    .wish-text {
+      margin: 0;
+      color: #5f3c40;
+      font-size: 17px;
+      line-height: 1.9;
+      font-weight: 650;
+      position: relative;
+      z-index: 1;
+    }
+    .signature {
+      margin: 18px 0 0;
+      color: #8a6065;
+      font-size: 16px;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .bottom {
+      padding: 18px 22px 26px;
+      position: relative;
+    }
+    .open-btn {
+      appearance: none;
+      border: 0;
+      width: min(100%, 245px);
+      min-height: 54px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff94b2, #f05d8b);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      box-shadow: 0 15px 32px rgba(236, 95, 142, .28);
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .28s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .open-btn:active {
+      transform: translateY(1px) scale(.99);
+      box-shadow: 0 10px 24px rgba(236, 95, 142, .2);
+    }
+    .hint {
+      margin: 10px 0 0;
+      color: #a77b80;
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .confetti {
+      z-index: 10;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+    .confetti span {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      border-radius: 3px;
+      opacity: 0;
+      animation: confettiFall 2.6s linear infinite;
+    }
+    .confetti span:nth-child(1) { left: 9%; top: -10%; background: #ff8fb1; animation-delay: .1s; }
+    .confetti span:nth-child(2) { left: 22%; top: -8%; background: #ffc766; animation-delay: .7s; }
+    .confetti span:nth-child(3) { left: 35%; top: -12%; background: #95e1d3; animation-delay: 1.2s; }
+    .confetti span:nth-child(4) { left: 49%; top: -7%; background: #ffcfdf; animation-delay: .35s; }
+    .confetti span:nth-child(5) { left: 62%; top: -10%; background: #ff715f; animation-delay: 1.5s; }
+    .confetti span:nth-child(6) { left: 76%; top: -8%; background: #fff1a7; animation-delay: .55s; }
+    .confetti span:nth-child(7) { left: 88%; top: -11%; background: #ff9ab8; animation-delay: 1.9s; }
+
+    .burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+    }
+    .burst span {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      opacity: 0;
+      background: #ff8fb1;
+    }
+
+    .opened .gift {
+      transform: translateX(-50%) translateY(12px) scale(.86);
+      opacity: .18;
+    }
+    .opened .gift-lid {
+      transform: rotate(-18deg) translateY(-28px);
+    }
+    .opened .bow {
+      transform: translateX(-50%) translateY(-34px) rotate(12deg) scale(1.08);
+    }
+    .opened .cake-scene {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+    .opened .wish-card {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      margin-top: 6px;
+    }
+    .opened .open-btn {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .opened .confetti {
+      opacity: 1;
+    }
+    .opened .confetti span {
+      opacity: 1;
+    }
+    .blown .flame {
+      opacity: 0;
+      transform: translateX(-50%) rotate(45deg) scale(.3);
+      transition: opacity .28s ease, transform .28s ease;
+    }
+    .blown .badge::after {
+      content: " 愿望+1";
+      color: #ec5f8e;
+    }
+
+    .burst.active span:nth-child(1) { animation: heartPop1 .9s ease-out forwards; }
+    .burst.active span:nth-child(2) { animation: heartPop2 .9s ease-out .03s forwards; background: #ffc766; }
+    .burst.active span:nth-child(3) { animation: heartPop3 .9s ease-out .06s forwards; background: #95e1d3; }
+    .burst.active span:nth-child(4) { animation: heartPop4 .9s ease-out .09s forwards; background: #ffb2c8; }
+    .burst.active span:nth-child(5) { animation: heartPop5 .9s ease-out .12s forwards; background: #fff1a7; }
+    .burst.active span:nth-child(6) { animation: heartPop6 .9s ease-out .15s forwards; background: #ff715f; }
+
+    @keyframes softBounce {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-7px) rotate(1deg); }
+    }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(.08); }
+    }
+    @keyframes miniHeart {
+      0%, 100% { transform: rotate(45deg) scale(1); }
+      50% { transform: rotate(45deg) scale(1.12); }
+    }
+    @keyframes bubbleFloat {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: .58; }
+      50% { transform: translate3d(14px,-22px,0) scale(1.05); opacity: .92; }
+    }
+    @keyframes heartDrift {
+      0%, 100% { transform: translate3d(0,0,0) rotate(45deg); opacity: .28; }
+      50% { transform: translate3d(10px,-28px,0) rotate(52deg); opacity: .55; }
+    }
+    @keyframes flame {
+      0%, 100% { transform: translateX(-50%) rotate(45deg) scale(1); }
+      50% { transform: translateX(-50%) rotate(45deg) scale(.88, 1.12); }
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      12% { opacity: .98; }
+      100% { transform: translateY(100vh) rotate(300deg); opacity: 0; }
+    }
+    @keyframes heartPop1 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(-85px,-90px) scale(1.2); } }
+    @keyframes heartPop2 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(72px,-100px) scale(1.1); } }
+    @keyframes heartPop3 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(-42px,-125px) scale(1); } }
+    @keyframes heartPop4 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(38px,-118px) scale(1.18); } }
+    @keyframes heartPop5 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(-95px,-35px) scale(1); } }
+    @keyframes heartPop6 { 0% { opacity: 1; transform: translate(0,0) scale(.2); } 100% { opacity: 0; transform: translate(96px,-42px) scale(1.1); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .page { padding-left: 12px; padding-right: 12px; }
+      .card { border-radius: 26px; }
+      .top { padding: 24px 16px 0; }
+      .stage { height: 198px; }
+      .wish-card { margin-left: 16px; margin-right: 16px; }
+      .wish-text { font-size: 16px; }
+      .bottom { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="sky" aria-hidden="true">
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="heart-float"></span>
+      <span class="heart-float"></span>
+      <span class="heart-float"></span>
+    </div>
+
+    <div class="confetti" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+
+    <section class="card" id="card" aria-labelledby="page-title">
+      <div class="top">
+        <div class="badge">生日小惊喜</div>
+
+        <div class="bear-wrap" aria-hidden="true">
+          <span class="bear-ear left"></span>
+          <span class="bear-ear right"></span>
+          <span class="bear-head"></span>
+          <span class="bear-eye left"></span>
+          <span class="bear-eye right"></span>
+          <span class="bear-nose"></span>
+          <span class="bear-mouth"></span>
+          <span class="bear-heart"></span>
+        </div>
+
+        <h1 id="page-title">妈妈，生日快乐</h1>
+        <p class="sub">愿今天的每一点温柔，都慢慢来到您身边。</p>
+
+        <div class="stage">
+          <div class="gift" id="gift" aria-hidden="true">
+            <span class="bow"><span class="bow-knot"></span></span>
+            <span class="gift-lid"></span>
+            <span class="gift-box"></span>
+          </div>
+
+          <div class="cake-scene" id="cakeScene" aria-hidden="true">
+            <span class="cake-plate"></span>
+            <span class="cake-base"></span>
+            <span class="sprinkle s1"></span>
+            <span class="sprinkle s2"></span>
+            <span class="sprinkle s3"></span>
+            <span class="candle c1"><span class="flame"></span></span>
+            <span class="candle c2"><span class="flame"></span></span>
+            <span class="candle c3"><span class="flame"></span></span>
+          </div>
+
+          <div class="burst" id="burst" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wish-card" id="wishBox" aria-live="polite">
+        <div class="wish-inner">
+          <div class="wish-paper">
+            <p class="wish-text">
+              妈妈，生日快乐。愿春有花、夏有风、秋有月、冬有暖，愿你往后每一程，都平安顺遂，舒心自在。
+            </p>
+            <p class="signature">——苏天赐</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <button class="open-btn" type="button" id="openWish">打开生日惊喜</button>
+        <p class="hint" id="hint">打开礼物后，可以轻触蛋糕许愿</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var card = document.getElementById("card");
+      var button = document.getElementById("openWish");
+      var cake = document.getElementById("cakeScene");
+      var burst = document.getElementById("burst");
+      var hint = document.getElementById("hint");
+      var opened = false;
+
+      function popHearts() {
+        burst.classList.remove("active");
+        void burst.offsetWidth;
+        burst.classList.add("active");
+      }
+
+      button.addEventListener("click", function () {
+        if (opened) return;
+        opened = true;
+        card.classList.add("opened");
+        button.setAttribute("aria-expanded", "true");
+        hint.textContent = "轻触蛋糕，可以再许一个小愿望";
+        setTimeout(popHearts, 520);
+      });
+
+      cake.addEventListener("click", function () {
+        if (!opened) return;
+        card.classList.add("blown");
+        hint.textContent = "愿望已经悄悄点亮";
+        popHearts();
+
+        setTimeout(function () {
+          card.classList.remove("blown");
+        }, 1600);
+      });
+
+      button.setAttribute("aria-expanded", "false");
+    })();
+  </script>
+</body>
+</html>
